@@ -27,6 +27,22 @@ class Tree
     false
   end
 
+  def insert(value, node = @root)
+    return if include?(value)
+
+    if node.left.nil? && node.value > value
+      node.left = Node.new(value)
+      nil
+    elsif node.right.nil? && node.value < value
+      node.right = Node.new(value)
+      nil
+    elsif node.value > value
+      insert(value, node.left)
+    else
+      insert(value, node.right)
+    end
+  end
+
   private
 
   def build_tree(array)
