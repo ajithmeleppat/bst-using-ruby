@@ -30,17 +30,21 @@ class Tree
   def insert(value, node = @root)
     return if include?(value)
 
-    if node.left.nil? && node.value > value
-      node.left = Node.new(value)
-      nil
-    elsif node.right.nil? && node.value < value
-      node.right = Node.new(value)
-      nil
-    elsif node.value > value
+    if value < node.value
+      node.left = Node.new(value) if node.left.nil?
       insert(value, node.left)
     else
+      node.right = Node.new(value) if node.right.nil?
       insert(value, node.right)
     end
+  end
+
+  def delete(value)
+    return nil unless include?(value)
+
+    parent, node = get_node(value)
+    children = number_of_children(node)
+    handle_children(parent, node, children)
   end
 
   private
@@ -53,5 +57,52 @@ class Tree
     node.left = build_tree(array[0...mid])
     node.right = build_tree(array[mid + 1..])
     node
+  end
+
+  def get_node(value)
+    node = @root
+    parent = nil
+    until node.value == value
+      parent = node
+      node = node.value > value ? node.left : node.right
+    end
+    [parent, node]
+  end
+
+  def number_of_children(node)
+    if node.left.nil? && node.right.nil?
+      0
+    elsif node.left.nil? || node.right.nil?
+      1
+    else
+      2
+    end
+  end
+
+  def handle_children(parent, node, children)
+    if children.zero?
+      delete_leaf(parent, node)
+    elsif children == 1
+      delete_node_with_one_child(parent, node)
+    else
+      print 'two children'
+    end
+  end
+
+  def delete_leaf(parent, node)
+    if parent.value > node.value
+      parent.left = nil
+    else
+      parent.right = nil
+    end
+  end
+
+  def delete_node_with_one_child(parent, node)
+    child = node.left.nil? ? node.right : node.left
+    if parent.value > node.value
+      parent.left = child
+    else
+      parent.right = child
+    end
   end
 end
